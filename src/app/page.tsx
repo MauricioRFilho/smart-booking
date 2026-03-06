@@ -4,6 +4,12 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ArrowRight, Star, ShieldCheck, Zap, MessageCircle, TrendingUp, Calendar } from "lucide-react"
 import Link from "next/link"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Nexus | Protocolo de Performance Absolute",
+  description: "Capture clientes com o fluxo de agendamento cirúrgico e direto da Nexus. Gestão bruta de performance para profissionais de elite.",
+}
 
 export default function Home() {
   return (

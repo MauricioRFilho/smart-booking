@@ -12,6 +12,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const metadata: Metadata = {
+  title: "Nexus Scheduler | Agendamento Absolute",
+  description: "Sistema de agendamento de elite para profissionais de alta performance. Gestão financeira bruta e integração direta com WhatsApp.",
+  keywords: ["agendamento", "nexus", "scheduler", "gestão financeira", "whatsapp", "saas", "elite", "performance"],
+};
+
 import { ThemeProvider } from "@/components/theme-provider";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
