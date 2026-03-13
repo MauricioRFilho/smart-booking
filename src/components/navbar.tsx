@@ -1,35 +1,15 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { createClient } from "@/lib/supabase/client"
+import { useSession, signOut } from "next-auth/react"
 import { ThemeToggle } from "./theme-toggle"
-import { Calendar, LayoutDashboard, LogIn, UserPlus, LogOut } from "lucide-react"
+import { LanguageToggle } from "./language-toggle"
+import { Calendar, LayoutDashboard, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function Navbar() {
-  const [user, setUser] = useState<any>(null)
-  const supabase = createClient()
-  const router = useRouter()
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user)
-    })
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
-    })
-
-    return () => subscription.unsubscribe()
-  }, [supabase.auth])
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut()
-    router.push("/")
-    router.refresh()
-  }
+  const { data: session } = useSession()
+  const user = session?.user
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-black/10 dark:border-white/10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md">
@@ -55,23 +35,28 @@ export function Navbar() {
         <div className="flex items-center gap-2">
           {!user ? (
             <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" asChild className="font-bold uppercase text-[10px] tracking-widest text-slate-600 dark:text-slate-400">
+              <Button variant="ghost" size="sm" asChild className="hidden sm:inline-flex font-bold uppercase text-[10px] tracking-widest text-slate-600 dark:text-slate-400">
                 <Link href="/login">Entrar</Link>
               </Button>
-              <Button size="sm" asChild className="font-bold uppercase text-[10px] tracking-widest h-8 bg-primary text-white hover:bg-primary/90">
+              <Button size="sm" asChild className="font-bold uppercase text-[10px] tracking-widest h-8 bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/20">
                 <Link href="/register">Cadastrar</Link>
               </Button>
             </div>
           ) : (
-            <div className="flex items-center gap-4">
-              <span className="hidden lg:inline text-[10px] font-bold uppercase tracking-tighter text-muted-foreground">{user.email}</span>
-              <Button variant="outline" size="sm" onClick={handleSignOut} className="h-8 font-bold uppercase text-[10px] tracking-widest border-black/10 dark:border-white/20">
-                <LogOut className="w-3.5 h-3.5 mr-2" />
-                <span>Sair</span>
+            <div className="flex items-center gap-3">
+              <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-white/5 border border-black/5 dark:border-white/5">
+                <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                <span className="text-[10px] font-bold uppercase tracking-tight text-slate-600 dark:text-slate-400">{user.name || user.email?.split('@')[0]}</span>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => signOut({ callbackUrl: "/" })} className="h-8 font-bold uppercase text-[10px] tracking-widest border-black/10 dark:border-white/20 bg-white/50 dark:bg-white/5 backdrop-blur-sm">
+                <LogOut className="w-3.5 h-3.5 sm:mr-2" />
+                <span className="hidden sm:inline">Sair</span>
               </Button>
             </div>
           )}
-          <div className="ml-2 pl-2 border-l border-black/10 dark:border-white/10">
+          
+          <div className="flex items-center gap-1.5 ml-2 pl-2 border-l border-black/10 dark:border-white/10">
+            <LanguageToggle />
             <ThemeToggle />
           </div>
         </div>

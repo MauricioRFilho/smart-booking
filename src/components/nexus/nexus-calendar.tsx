@@ -1,16 +1,16 @@
 "use client"
 
 import { useState } from "react"
-import { format, startOfToday, setHours, setMinutes } from "date-fns"
+import { format, setHours, setMinutes } from "date-fns"
 import { ptBR } from "date-fns/locale"
+import { Button } from "@/components/ui/button"
 import { Calendar as CalendarComponent } from "@/components/ui/calendar"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Clock, MessageCircle, Calendar, User, Phone, CheckCircle2, Zap, ArrowRight } from "lucide-react"
-import { createClient } from "@/lib/supabase/client"
-import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
+import { User, Phone, CheckCircle2, Zap, ArrowRight } from "lucide-react"
+import { createAppointment } from "@/actions/appointments"
+import { Input } from "@/components/ui/input"
 
 const AVAILABLE_HOURS = [
   "09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00", "18:00"
@@ -21,7 +21,6 @@ const DEFAULT_SERVICE_ID = "e7c8c3b1-5c2b-5c2b-9c2b-2b3c4d5e6f7a"
 const WHATSAPP_NUMBER = "5541998240536"
 
 export function NexusCalendar() {
-  const supabase = createClient()
   const [date, setDate] = useState<Date | undefined>(new Date())
   const [selectedTime, setSelectedTime] = useState<string | null>(null)
   const [clientName, setClientName] = useState("")
@@ -54,19 +53,14 @@ export function NexusCalendar() {
       const startTime = setMinutes(setHours(date, hours), minutes)
       const endTime = setMinutes(setHours(date, hours + 1), minutes)
 
-      const { error } = await supabase
-        .from("appointments")
-        .insert({
-          professional_id: DEFAULT_PROFESSIONAL_ID,
-          service_id: DEFAULT_SERVICE_ID,
-          client_name: clientName,
-          client_phone: clientPhone,
-          start_time: startTime.toISOString(),
-          end_time: endTime.toISOString(),
-          status: "pending"
-        })
+      const result = await createAppointment({
+        clientName,
+        clientPhone,
+        startTime: startTime.toISOString(),
+        endTime: endTime.toISOString()
+      })
 
-      if (error) throw error
+      if (result.error) throw new Error(result.error)
 
       setIsSuccess(true)
       
@@ -81,9 +75,9 @@ export function NexusCalendar() {
         window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, "_blank")
       }, 1500)
 
-    } catch (err) {
+    } catch (err: any) {
       console.error("Erro ao agendar:", err)
-      alert("Erro ao realizar agendamento. Tente novamente.")
+      alert(err.message || "Erro ao realizar agendamento. Tente novamente.")
     } finally {
       setIsLoading(false)
     }

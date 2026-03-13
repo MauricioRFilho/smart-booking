@@ -4,11 +4,10 @@ import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts"
 import { TrendingUp, Users, DollarSign, CalendarCheck } from "lucide-react"
-import { createClient } from "@/lib/supabase/client"
-import { format, subDays, startOfDay, endOfDay } from "date-fns"
+import { getDashboardStats } from "@/actions/appointments"
+import { format, subDays } from "date-fns"
 
 export function NexusDashboard() {
-  const supabase = createClient()
   const [stats, setStats] = useState({
     totalRevenue: 0,
     newClients: 0,
@@ -21,30 +20,22 @@ export function NexusDashboard() {
   useEffect(() => {
     async function fetchStats() {
       try {
-        // Fetch appointments with service price
-        const { data: appointments, error } = await supabase
-          .from("appointments")
-          .select(`
-            *,
-            services (price)
-          `)
-
-        if (error) throw error
+        const appointments = await getDashboardStats()
 
         if (appointments) {
-          const totalRevenue = appointments.reduce((acc, curr) => acc + (Number(curr.services?.price) || 0), 0)
+          const totalRevenue = appointments.reduce((acc, curr: any) => acc + (Number(curr.service?.price) || 0), 0)
           const totalAppointments = appointments.length
-          const uniqueClients = new Set(appointments.map(a => a.client_phone)).size
+          const uniqueClients = new Set(appointments.map((a: any) => a.client_phone)).size
 
           // Generate last 7 days chart data
           const last7Days = Array.from({ length: 7 }, (_, i) => {
             const date = subDays(new Date(), 6 - i)
             const dayLabel = format(date, "EEE")
-            const dayAppointments = appointments.filter(a => {
+            const dayAppointments = appointments.filter((a: any) => {
               const aDate = new Date(a.start_time)
               return aDate.getDate() === date.getDate() && aDate.getMonth() === date.getMonth()
             })
-            const dayRevenue = dayAppointments.reduce((acc, curr) => acc + (Number(curr.services?.price) || 0), 0)
+            const dayRevenue = dayAppointments.reduce((acc, curr: any) => acc + (Number(curr.service?.price) || 0), 0)
             
             return {
               name: dayLabel,
@@ -57,7 +48,7 @@ export function NexusDashboard() {
             totalRevenue,
             totalAppointments,
             newClients: uniqueClients,
-            conversionRate: 24.5 + (totalAppointments > 0 ? 5 : 0), // Mocked logic for demo
+            conversionRate: 24.5 + (totalAppointments > 0 ? 5 : 0),
             chartData: last7Days
           })
         }

@@ -1,36 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Nexus Scheduler | Absolute Performance
 
-## Getting Started
+Sistema de agendamento de elite para profissionais de alta performance. Gestão financeira bruta e integração direta com WhatsApp.
 
-First, run the development server:
+![Nexus Preview](https://nexus-scheduler.vercel.app/og-image.png)
 
+## 🚀 Vision
+Nexus foi projetado para quem não aceita distrações. Um cockpit técnico para gestão de tempo e faturamento, focado em **resultados absolutos**.
+
+## 🛠 Tech Stack
+- **Framework:** Next.js 15
+- **Engine:** React 19
+- **Style:** Tailwind CSS v4
+- **Compute/DB:** Supabase (Auth/Postgres)
+
+## 🏗 Arquitetura
+Para detalhes sobre a engenharia por trás do Nexus, consulte nosso [ARCHITECTURE.md](./ARCHITECTURE.md).
+
+## ⚡ Quick Start
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🌐 Internacionalização
+Suporte nativo para:
+- 🇧🇷 Português (Brasil)
+- 🇺🇸 English (US)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🌓 Dark Mode
+Suporte total para temas Dark e Light com design glassmorphism premium.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+Built by [Nexus Labs_](https://github.com/macmauricio)
