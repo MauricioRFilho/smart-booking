@@ -1,75 +1,61 @@
-# Arquitetura do Sistema: Smart Booking (Nexus)
+# Arquitetura do Sistema - Smart Booking (v2)
 
-Este documento detalha a arquitetura técnica, fluxo de dados e estrutura de componentes do ecossistema Nexus.
+Este documento descreve a nova arquitetura do sistema após a migração do Supabase para **Prisma + Auth.js**.
 
-## Visão Geral Técnica
+## Visão Geral
 
-Nexus é uma plataforma de agendamento de alta performance construída com tecnologias modernas de 2026, focada em velocidade, design minimalista (Absolute) e integração resiliente.
+O sistema utiliza **Next.js 15+** com a arquitetura de **App Router** e **Server Actions**. A camada de dados é gerenciada pelo **Prisma ORM**, conectando-se a um banco de dados PostgreSQL persistente (Neon/Vercel).
 
-### Tech Stack
-- **Frontend:** Next.js 15 (App Router), React 19.
-- **Styling:** Tailwind CSS v4 (Modern Engine).
-- **Componentes:** Radix UI (Unstyled primitives).
-- **Backend-as-a-Service:** Supabase (PostgreSQL, Auth).
-- **Icons:** Lucide-React.
-
-## Diagrama de Arquitetura
+## Fluxo de Autenticação e Dados
 
 ```mermaid
 graph TD
     User((Usuário))
     
-    subgraph Client_Side [Next.js Client]
-        UI[Nexus UI Components]
-        Context[Theme/Language Context]
-        AuthClient[Supabase Auth Client]
+    subgraph Frontend [Next.js Client]
+        Navbar[Navbar / useSession]
+        Login[Página de Login]
+        Register[Página de Registro]
+        Dashboard[Nexus Dashboard]
+        Calendar[Nexus Calendar]
     end
-    
-    subgraph Server_Side [Next.js Server]
-        API[Edge API Routes]
-        Layout[Server Layouts]
+
+    subgraph Backend [Next.js Server Actions / API]
+        AuthJS[[Auth.js / NextAuth]]
+        ActionLogin[loginUser Action]
+        ActionRegister[registerUser Action]
+        ActionAppointments[getStats/createAppointment]
     end
-    
-    subgraph Data_Layer [Infrastructure]
-        Supabase[(Supabase DB)]
-        AuthService[Supabase Auth]
+
+    subgraph Database [Persistence Layer]
+        Prisma[[Prisma Client]]
+        DB[(PostgreSQL)]
     end
+
+    User --> Login
+    User --> Register
+    Login --> ActionLogin
+    Register --> ActionRegister
+    ActionLogin --> AuthJS
+    ActionRegister --> Prisma
+    AuthJS --> Prisma
+    Prisma --> DB
     
-    User -->|Interage| UI
-    UI -->|Lê/Grava| AuthClient
-    AuthClient <-->|Session| AuthService
-    UI -->|Query| API
-    API <-->|SQL| Supabase
-    
-    subgraph Core_Engine [Nexus Engine]
-        NexusCalendar[NexusCalendar Engine]
-        NexusDashboard[Performance Analytics]
-    end
-    
-    UI --> NexusCalendar
-    UI --> NexusDashboard
+    Dashboard --> ActionAppointments
+    Calendar --> ActionAppointments
+    ActionAppointments --> Prisma
 ```
 
-## Fluxo de Agendamento
+## Modelos de Dados (Prisma)
 
-```mermaid
-sequenceDiagram
-    participant U as Usuário
-    participant C as NexusCalendar
-    participant S as Supabase
-    participant W as WhatsApp API
-    
-    U->>C: Seleciona Data/Hora
-    C->>S: Verifica Disponibilidade
-    S-->>C: Status: Disponível
-    U->>C: Confirma Dados
-    C->>S: Salva Agendamento
-    C->>W: Gera Link Direto (No-Fee)
-    W-->>U: Confirmação via WhatsApp
-```
+- **User**: Informações do usuário e autenticação.
+- **Account/Session**: Gerenciamento de tokens e sessões do Auth.js.
+- **Service**: Catálogo de serviços disponíveis para agendamento.
+- **Appointment**: Registro de agendamentos entre Profissionais e Clientes.
 
-## Estrutura de Diretórios
-- `src/app/`: Rotas e layouts do sistema.
-- `src/components/nexus/`: Componentes core da engine Nexus.
-- `src/components/ui/`: Primitivas de interface (shadcn-like).
-- `src/lib/`: Utilitários, configurações do Supabase e hooks customizados.
+## Vantagens da Nova Arquitetura
+
+1.  **Resiliência**: Banco de dados não "pausa" por inatividade (cold start rápido).
+2.  **Segurança**: Senhas criptografadas com `bcryptjs` e sessões gerenciadas por JWT seguro.
+3.  **Performance**: Consultas otimizadas via Prisma Singleton.
+4.  **Manutenibilidade**: Código tipado de ponta a ponta com TypeScript.
